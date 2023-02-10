@@ -12,7 +12,7 @@ services:
         volumes:
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf
         networks:
-            - host
+            - jellyfin
     
     jellyfin:
         container_name: jellyfin
@@ -24,9 +24,9 @@ services:
         - ./jellyfin/cache:/cache
         - ./jellyfin/media/:/media
         networks:
-            - host
+            - jellyfin
 
 networks:
-    host:
-        name: host 
+    jellyfin:
+        name: jellyfin 
         driver: bridge
