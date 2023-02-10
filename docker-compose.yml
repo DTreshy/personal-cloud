@@ -27,6 +27,6 @@ services:
             - host
 
 networks:
-    host:
+    default:
         name: host 
         driver: bridge
