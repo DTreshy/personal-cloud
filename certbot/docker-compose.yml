@@ -8,4 +8,4 @@ services:
       volumes: 
         - ./certbot/conf:/etc/letsencrypt
         - ./certbot/www:/var/www/certbot
-      command: certonly --webroot -w /var/www/certbot --rsa-key-size 4096 --force-renewal --email szczukowski.damian@gmail.com -d dsprojects.pl -d www.dsprojects.pl d transmission.dsprojects.pl -d cloud.dsprojects.pl -d jellyfin.dsprojects.pl --agree-tos
+      command: certonly --webroot -w /var/www/certbot --rsa-key-size 4096 --force-renewal --email szczukowski.damian@gmail.com -d dsprojects.pl -d www.dsprojects.pl -d transmission.dsprojects.pl -d cloud.dsprojects.pl -d jellyfin.dsprojects.pl --agree-tos
