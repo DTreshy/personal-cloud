@@ -31,4 +31,3 @@ services:
 networks:
     jellyfin:
         driver: bridge
-        external: true
