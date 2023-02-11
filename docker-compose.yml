@@ -27,6 +27,23 @@ services:
         - ./jellyfin/media/:/media
         networks:
             - jellyfin
+    transmission:
+        image: linuxserver/transmission
+        container_name: transmission
+        environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Europe/Warsaw
+        - USER={TRANSMISSION_USER}
+        - PASS={TRANSMISSION_PASS}
+        volumes:
+        - ./transmission/config:/config
+        - ./transmission/downloads:/downloads
+        - ./transmission/watch:/watch
+        ports:
+        - "51413:51413"
+        - "51413:51413/udp"
+        restart: unless-stopped
 
 networks:
     jellyfin:
