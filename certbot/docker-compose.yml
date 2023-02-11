@@ -8,4 +8,4 @@ services:
       volumes: 
         - ./certbot/conf:/etc/letsencrypt
         - ./certbot/www:/var/www/certbot
-      command: certonly --webroot -w /var/www/certbot --force-renewal --email {email} -d {domain} --agree-tos
+      command: certonly --webroot -w /var/www/certbot --force-renewal --email szczukowski.damian@gmail.com -d dsprojects.pl -d cloud.dsprojects.pl -d www.dsprojects.pl -d jellyfin.dsprojects.pl --agree-tos
