@@ -44,7 +44,7 @@
       certResolver = "leresolver"
       [[entryPoints.https.http.tls.domains]]
         main = "dsprojects.pl"
-        sans = ["transmission.dsprojects.pl", "jellyfin.dsprojects.pl"]
+        sans = ["transmission.dsprojects.pl", "jellyfin.dsprojects.pl", "traefik.dsprojects.pl"]
 
 # Enable ACME (Let's Encrypt): automatic SSL.
 [certificatesresolvers.leresolver.acme]
