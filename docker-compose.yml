@@ -122,7 +122,7 @@ services:
       - "traefik.http.middlewares.transmission-mw.headers.customFrameOptionsValue='allow-from https://transmission.dsprojects.pl'"
       ## HTTP Service
       - 'traefik.http.routers.transmission.service=transmission-svc'
-      - 'traefik.http.services.transmission-svc.loadBalancer.server.port=9091'
+      - 'traefik.http.services.transmission-svc.loadBalancer.server.port=80'
       - 'traefik.http.routers.transmission-insecure.entryPoints=http'
       - 'traefik.http.routers.transmission-insecure.rule=Host(`transmission.dsprojects.pl`)'
       - 'traefik.http.routers.transmission-insecure.middlewares=transmission-insecure-mw'
