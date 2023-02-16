@@ -86,7 +86,7 @@ services:
       ## HTTP Service
       # We define the port here as a port is required, but note that the service is pointing to the service defined in @file
       - 'traefik.http.routers.jellyfin.service=traefik-personal-cloud@docker'
-      - 'traefik.http.services.jellyfin-svc.loadBalancer.passHostHeader=true'
+      - 'traefik.http.services.traefik-personal-cloud.passHostHeader=true'
       ## Redirection of HTTP on port 9999 to HTTPS on port 9999 (consistent protocol)
       - 'traefik.http.routers.jellyfin-insecure.entryPoints=http'
       - 'traefik.http.routers.jellyfin-insecure.rule=Host(`jellyfin.dsprojects.pl`)'
@@ -117,6 +117,7 @@ services:
       ## HTTP Router
       - 'traefik.http.routers.transmission.entryPoints=https'
       - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.transmission.rule=Host(`transmission.dsprojects.pl`)'
       - 'traefik.http.routers.transmission.tls=true'
       - 'traefik.http.routers.transmission.tls.certResolver=leresolver'
       - 'traefik.http.routers.transmission.tls.domains=transmission.dsprojects.pl'
