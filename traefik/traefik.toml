@@ -60,7 +60,7 @@
         # SANS are any other hostnames which Traefik should obtain a certificate for.
         # If you are using DNS for LetsEncrypt, you can set a wildcard.
         # Include all possible hostnames of this server.
-        sans = ["jellyfin.dsprojects.pl, transmission.dsprojects.pl"]
+        sans = ["*.dsprojects.pl"]
 
 # Enable ACME (Let's Encrypt): automatic SSL.
 [certificatesresolvers.leresolver.acme]
