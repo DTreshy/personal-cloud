@@ -13,8 +13,6 @@ services:
       - ./traefik/traefik.toml:/traefik.toml
       # Configuration for the file provider (needed for host networking and default TLS Options)
       - ./traefik/traefik-provider.toml:/traefik-provider.toml
-      # LetsEncrypt ACME Configuration
-      - ./traefik/acme.json:/acme.json
       # Log File (optional)
       - ./traefik/traefik.log:/traefik.log
       - ./traefik/access.log:/access.log
