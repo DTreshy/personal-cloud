@@ -95,6 +95,6 @@ services:
       - traefik_proxy
 
   networks:
-  traefik_proxy:
-    external:
-      name: traefik_proxy
+    traefik_proxy:
+      external:
+        name: traefik_proxy
