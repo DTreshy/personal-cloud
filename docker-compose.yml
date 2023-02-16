@@ -1,134 +1,94 @@
-version: "3.3"
+version: '3.9'
 
 services:
 
-    certbot:
-        image: certbot/certbot
-        container_name: certbot
-        volumes: 
-            - ./certbot/www/:/var/www/certbot/:rw
-            - ./certbot/conf/:/etc/letsencrypt/:rw
-        command: certonly --webroot -w /var/www/certbot --rsa-key-size 4096 --force-renewal --email szczukowski.damian@gmail.com -d dsprojects.pl -d www.dsprojects.pl -d transmission.dsprojects.pl -d cloud.dsprojects.pl -d jellyfin.dsprojects.pl --agree-tos
-        networks:
-            - certbot_network
-        depends_on:
-            - nginx
+  traefik:
+    container_name: traefik
+    image: traefik:v2.9
+    restart: unless-stopped
+    volumes:
+      # So that Traefik can listen to the Docker events (read-only)
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # TOML Configuration with global options
+      - ./traefik/traefik.toml:/traefik.toml
+      # Configuration for the file provider (needed for host networking and default TLS Options)
+      - ./traefik/traefik-provider.toml:/traefik-provider.toml
+      # LetsEncrypt ACME Configuration
+      - ./traefik/acme.json:/acme.json
+      # Log File (optional)
+      - ./traefik/traefik.log:/traefik.log
+    ports:
+      # The Web UI (enabled by --api.insecure=true in traefik.toml)
+      - 8080:8080
+      # The Available Ports (forward your router's incoming ports to the ports on the host)
+      - 80:80
+      - 443:443
+    env_file: .env
 
-    nginx:
-        container_name: nginx
-        image: nginx:1.23.3-alpine
-        restart: unless-stopped
-        ports:
-            - 80:80
-            - 443:443
-        volumes:
-            - ./nginx/conf.d/:/etc/nginx/conf.d/
-            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-            - ./certbot/www:/var/www/certbot/:ro
-            - ./certbot/conf/:/etc/nginx/ssl/:ro
-        networks:
-            - nginx_network
-            - certbot_network
-        depends_on:
-            - transmission
-            - jellyfin
-    
-    jellyfin:
-        container_name: jellyfin
-        image: jellyfin/jellyfin
-        restart: unless-stopped
-        user: 1000:1000
-        volumes:
-        - ./jellyfin/config:/config
-        - ./jellyfin/cache:/cache
-        - ./jellyfin/media/:/media
-        networks:
-            - nginx_network
-
-    transmission:
-        container_name: transmission
-        image: linuxserver/transmission
-        restart: unless-stopped
-        ports:
-        - "51413:51413"
-        - "51413:51413/udp"
-        environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=Europe/Warsaw
-        - USER={TRANSMISSION_USER}
-        - PASS={TRANSMISSION_PASS}
-        volumes:
-        - ./transmission/config:/config
-        - ./transmission/downloads:/downloads
-        - ./transmission/watch:/watch
-        networks:
-            - nginx_network
-
-    sonarr:
-        image: linuxserver/sonarr
-        container_name: sonarr
-        environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=Europe/Rome
-        volumes:
-        - ./sonarr_config:/config
-        - /media/anime:/anime
-        - /media/tvshows:/tvshows
-        - /media/transmission/downloads/complete:/downloads/complete
-        ports:
-        - 8989:8989
-        restart: unless-stopped
-
-    radarr:
-        image: linuxserver/radarr
-        container_name: radarr
-        environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=Europe/Rome
-        volumes:
-        - ./radarr_config:/config
-        - /media/transmission/downloads/complete:/downloads/complete
-        - /media/movies:/movies
-        ports:
-        - 7878:7878
-        restart: unless-stopped
-
-    bazarr:
-        image: linuxserver/bazarr
-        container_name: bazarr
-        environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=Europe/Rome
-        volumes:
-        - ./bazarr_config:/config
-        - /media/movies:/movies #optional
-        - /media/tvshows:/tvshows #optional
-        - /media/anime:/anime
-        ports:
-        - 6767:6767
-        restart: unless-stopped
-
-    jellyseerr:
-        image: fallenbagel/jellyseerr:develop
-        container_name: jellyseerr
-        environment:
-        - LOG_LEVEL=debug
-        - TZ=Europe/Rome
-        ports:
-        - 5055:5055
-        volumes:
-        - ./jellyseerr_config:/app/config
-        restart: unless-stopped
-        depends_on:
-        - radarr
-        - sonarr
-
-networks:
-    nginx_network:
-        driver: bridge
-    certbot_network:
-        driver: bridge
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: 'jellyfin'
+    user: 1000:1000
+    # Network mode of 'host' exposes the ports on the host. This is needed for DLNA access.
+    network_mode: 'host'
+    volumes:
+      - /path/to/config:/config
+      - /path/to/cache:/cache
+      # Update this configuration as desired
+      - /path/to/media:/media
+    restart: always
+    labels:
+      - 'traefik.enable=true'
+      ## HTTP Router
+      #### Entry point where Jellyfin is accessible via
+      #### Change secure to https in the line below to have accessible without needing to specify a port and change the SSLHost option below
+      - 'traefik.http.routers.jellyfin.entryPoints=https'
+      #### Host or Path where Jellyfin is accessible
+      #### Remove (or change) this rule if you'd rather have Jellyfin accessible at a PathPrefix URI
+      - 'traefik.http.routers.jellyfin.rule=Host(`jellyfin.dsprojects.pl`)' # OPTIONAL: && PathPrefix(`/jellyfin`)
+      #### Enable TLS with the ACME/LetsEncrypt resolver for HOSTNAME.DOMAIN_NAME
+      - 'traefik.http.routers.jellyfin.tls=true'
+      - 'traefik.http.routers.jellyfin.tls.certResolver=leresolver'
+      - 'traefik.http.routers.jellyfin.tls.domains=jellyfin.dsprojects.pl'
+      ## Middleware
+      - 'traefik.http.routers.jellyfin.middlewares=jellyfin-mw'
+      #### The customResponseHeaders option lists the Header names and values to apply to the response.
+      - 'traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+      #### The sslRedirect is set to true, then only allow https requests.
+      - 'traefik.http.middlewares.jellyfin-mw.headers.SSLRedirect=true'
+      #### The sslHost option is the host name that is used to redirect http requests to https.
+      #### This is the exact URL that will be redirected to, so you can remove the :9999 port if using default SSL port
+      - 'traefik.http.middlewares.jellyfin-mw.headers.SSLHost=jellyfin.dsprojects.pl'
+      #### Set sslForceHost to true and set SSLHost to forced requests to use SSLHost even the ones that are already using SSL.
+      #### Note that this uses SSLHost verbatim, so add the port to SSLHost if you are using an alternate port.
+      - 'traefik.http.middlewares.jellyfin-mw.headers.SSLForceHost=true'
+      #### The stsSeconds is the max-age of the Strict-Transport-Security header. If set to 0, would NOT include the header.
+      - 'traefik.http.middlewares.jellyfin-mw.headers.STSSeconds=315360000'
+      #### The stsIncludeSubdomains is set to true, the includeSubDomains directive will be
+      #### appended to the Strict-Transport-Security header.
+      - 'traefik.http.middlewares.jellyfin-mw.headers.STSIncludeSubdomains=true'
+      #### Set stsPreload to true to have the preload flag appended to the Strict-Transport-Security header.
+      - 'traefik.http.middlewares.jellyfin-mw.headers.STSPreload=true'
+      #### Set forceSTSHeader to true, to add the STS header even when the connection is HTTP.
+      - 'traefik.http.middlewares.jellyfin-mw.headers.forceSTSHeader=true'
+      #### Set frameDeny to true to add the X-Frame-Options header with the value of DENY.
+      - 'traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true'
+      #### Set contentTypeNosniff to true to add the X-Content-Type-Options header with the value nosniff.
+      - 'traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true'
+      #### Set browserXssFilter to true to add the X-XSS-Protection header with the value 1; mode=block.
+      - 'traefik.http.middlewares.jellyfin-mw.headers.browserXSSFilter=true'
+      #### The customFrameOptionsValue allows the X-Frame-Options header value to be set with a custom value. This
+      #### overrides the FrameDeny option.
+      - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://jellyfin.dsprojects.pl'"
+      ## HTTP Service
+      # We define the port here as a port is required, but note that the service is pointing to the service defined in @file
+      - 'traefik.http.routers.jellyfin.service=jellyfin-svc@file'
+      - 'traefik.http.services.jellyfin-svc.loadBalancer.server.port=8096'
+      - 'traefik.http.services.jellyfin-svc.loadBalancer.passHostHeader=true'
+      ## Redirection of HTTP on port 9999 to HTTPS on port 9999 (consistent protocol)
+      - 'traefik.http.routers.jellyfin-insecure.entryPoints=secure'
+      - 'traefik.http.routers.jellyfin-insecure.rule=Host(`jellyfin.dsprojects.pl`)'
+      - 'traefik.http.routers.jellyfin-insecure.middlewares=jellyfin-insecure-mw'
+      - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.permanent=false'
+      - 'traefik.http.routers.jellyfin-insecure.service=noop@internal'
