@@ -56,7 +56,7 @@
     [entryPoints.https.http.tls]
       certResolver = "leresolver"
       [[entryPoints.https.http.tls.domains]]
-        main = "dsprojects.pl"
+        main = "jellyfin.dsprojects.pl"
         # SANS are any other hostnames which Traefik should obtain a certificate for.
         # If you are using DNS for LetsEncrypt, you can set a wildcard.
         # Include all possible hostnames of this server.
