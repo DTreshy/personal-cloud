@@ -30,7 +30,7 @@ services:
       - 'traefik.http.routers.traefik_https.tls.certResolver=staging'
       - 'traefik.http.routers.traefik_https.service=api@internal'
       - 'traefik.http.routers.traefik_https.middlewares=basic-auth-global'
-      - 'traefik.http.middlewares.basic-auth-global.basicauth.users=xd:xd'
+      - 'traefik.http.middlewares.basic-auth-global.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_ENCODED_PASS}'
     command:
       - --metrics.prometheus.addrouterslabels=true
 
