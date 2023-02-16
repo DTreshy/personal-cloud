@@ -215,4 +215,4 @@ volumes:
 
 networks:
   nextcloud:
-    external: true
+    driver: bridge
