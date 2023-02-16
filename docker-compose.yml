@@ -24,8 +24,6 @@ services:
       - 80:80
       - 443:443
     env_file: .env
-    networks:
-      - traefik_proxy
 
   jellyfin:
     container_name: jellyfin
@@ -92,8 +90,6 @@ services:
       - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.scheme=https'
       - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.jellyfin-insecure.service=noop@internal'
-    networks:
-      - traefik_proxy
 
   networks:
     traefik_proxy:
