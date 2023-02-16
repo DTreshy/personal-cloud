@@ -73,7 +73,7 @@
   # Mandatory for wildcard certificate generation.
   [certificatesresolvers.leresolver.acme.dnsChallenge]
     # Update this to your provider of choice and then ensure necessary variables are in the .env file to support it.
-    provider = "rfc2136"
+    provider = "ovh"
     delayBeforeCheck = 0
     # A DNS server used to check whether the DNS is set up correctly before
     # making the ACME request. Ideally a DNS server that isn't going to cache an old entry.
