@@ -42,6 +42,7 @@ services:
       #### Entry point where Jellyfin is accessible via
       #### Change secure to https in the line below to have accessible without needing to specify a port and change the SSLHost option below
       - 'traefik.http.routers.jellyfin.entryPoints=https'
+      - "traefik.docker.network=traefik_proxy"
       #### Host or Path where Jellyfin is accessible
       #### Remove (or change) this rule if you'd rather have Jellyfin accessible at a PathPrefix URI
       - 'traefik.http.routers.jellyfin.rule=Host(`jellyfin.dsprojects.pl`)' # OPTIONAL: && PathPrefix(`/jellyfin`)
