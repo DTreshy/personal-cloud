@@ -66,17 +66,16 @@
 [certificatesresolvers.leresolver.acme]
   email = "szczukowski.damian@gmail.com"
   storage = "acme.json"
-  # Use HTTP-01 ACME challenge
-  #[certificateresolvers.leresolver.acme.httpChallenge]
-  #  entryPoint = "http"
-  # Use a DNS-01 ACME challenge rather than HTTP-01 challenge.
-  # Mandatory for wildcard certificate generation.
   [certificatesresolvers.leresolver.acme.dnsChallenge]
     # Update this to your provider of choice and then ensure necessary variables are in the .env file to support it.
     provider = "ovh"
     delayBeforeCheck = 0
-    # A DNS server used to check whether the DNS is set up correctly before
-    # making the ACME request. Ideally a DNS server that isn't going to cache an old entry.
+    resolvers = ["8.8.8.8:53"]
+
+  [certificatesResolvers.staging.acme.dnsChallenge]
+    provider = "ovh"
+    caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+    delayBeforeCheck = 0
     resolvers = ["8.8.8.8:53"]
 
 [accessLog]

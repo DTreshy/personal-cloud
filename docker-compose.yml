@@ -46,7 +46,7 @@ services:
       - "traefik.docker.network=traefik"
       - 'traefik.http.routers.jellyfin.rule=Host(`jellyfin.dsprojects.pl`)'
       - 'traefik.http.routers.jellyfin.tls=true'
-      - 'traefik.http.routers.jellyfin.tls.certResolver=leresolver'
+      - 'traefik.http.routers.jellyfin.tls.certResolver=staging'
       - 'traefik.http.routers.jellyfin.tls.domains=jellyfin.dsprojects.pl'
       ## Middleware
       - 'traefik.http.routers.jellyfin.middlewares=jellyfin-mw'
@@ -63,7 +63,8 @@ services:
       - 'traefik.http.middlewares.jellyfin-mw.headers.browserXSSFilter=true'
       - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://jellyfin.dsprojects.pl'"
       ## HTTP Service
-      - 'traefik.http.routers.jellyfin.service=traefik-personal-cloud'
+      - 'traefik.http.routers.jellyfin.service=jellyfin-svc'
+      - 'traefik.http.services.jellyfin-svc.loadBalancer.server.port=8096'
       - 'traefik.http.routers.jellyfin-insecure.entryPoints=http'
       - 'traefik.http.routers.jellyfin-insecure.rule=Host(`jellyfin.dsprojects.pl`)'
       - 'traefik.http.routers.jellyfin-insecure.middlewares=jellyfin-insecure-mw'
@@ -95,7 +96,7 @@ services:
       - "traefik.docker.network=traefik"
       - 'traefik.http.routers.transmission.rule=Host(`transmission.dsprojects.pl`)'
       - 'traefik.http.routers.transmission.tls=true'
-      - 'traefik.http.routers.transmission.tls.certResolver=leresolver'
+      - 'traefik.http.routers.transmission.tls.certResolver=staging'
       - 'traefik.http.routers.transmission.tls.domains=transmission.dsprojects.pl'
       ## Middleware
       - 'traefik.http.routers.transmission.middlewares=transmission-mw'
@@ -112,7 +113,8 @@ services:
       - 'traefik.http.middlewares.transmission-mw.headers.browserXSSFilter=true'
       - "traefik.http.middlewares.transmission-mw.headers.customFrameOptionsValue='allow-from https://transmission.dsprojects.pl'"
       ## HTTP Service
-      - 'traefik.http.routers.transmission.service=traefik-personal-cloud'
+      - 'traefik.http.routers.jellyfin.service=transmission-svc'
+      - 'traefik.http.services.jellyfin-svc.loadBalancer.server.port=9091'
       - 'traefik.http.routers.transmission-insecure.entryPoints=http'
       - 'traefik.http.routers.transmission-insecure.rule=Host(`transmission.dsprojects.pl`)'
       - 'traefik.http.routers.transmission-insecure.middlewares=transmission-insecure-mw'
