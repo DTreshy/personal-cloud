@@ -20,7 +20,8 @@
   # available directly on the entryPoint named traefik. If the entryPoint
   # named traefik is not configured, it will be automatically created on
   # port 8080.
-  insecure = true
+  insecure = false
+  dashboard = true
 
 [providers]
   [providers.docker]
@@ -44,7 +45,7 @@
       certResolver = "leresolver"
       [[entryPoints.https.http.tls.domains]]
         main = "dsprojects.pl"
-        sans = ["transmission.dsprojects.pl", "jellyfin.dsprojects.pl", "traefik.dsprojects.pl"]
+        sans = ["transmission.dsprojects.pl", "jellyfin.dsprojects.pl", "traefik.dsprojects.pl", "cloud.dsprojects.pl"]
 
 # Enable ACME (Let's Encrypt): automatic SSL.
 [certificatesresolvers.leresolver.acme]

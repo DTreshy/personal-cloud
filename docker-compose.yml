@@ -31,6 +31,10 @@ services:
       - 'traefik.http.routers.traefik_https.service=api@internal'
       - 'traefik.http.routers.traefik_https.middlewares=basic-auth-global'
       - 'traefik.http.middlewares.basic-auth-global.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_ENCODED_PASS}'
+    depends_on:
+      - jellyfin
+      - transmission
+      - nextcloud
     command:
       - --metrics.prometheus.addrouterslabels=true
 
@@ -126,6 +130,85 @@ services:
       - 'traefik.http.middlewares.transmission-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.transmission-insecure.service=noop@internal'
 
+  postgres:
+    restart: always
+    image: postgres:latest
+    networks:
+      - nextcloud
+    environment:
+    - POSTGRES_USER=${POSTGRES_USER}
+    - POSTGRES_PASSWORD=${POSTGRES_PASS}
+    - POSTGRES_DB=nextcloud
+    volumes:
+    - nextcloud-db:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    restart: always
+    networks:
+      - nextcloud
+    volumes:
+      - redis:/var/lib/redis
+
+  nextcloud:
+    image: nextcloud:latest
+    restart: always
+    networks:
+      - nextcloud
+    depends_on:
+      - redis
+      - postgres
+    labels:
+      - 'traefik.enable=true'
+      ## HTTP Router
+      - 'traefik.http.routers.nextcloud.entryPoints=https'
+      - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.nextcloud.rule=Host(`cloud.dsprojects.pl`)'
+      - 'traefik.http.routers.nextcloud.tls=true'
+      - 'traefik.http.routers.nextcloud.tls.certResolver=staging'
+      - 'traefik.http.routers.nextcloud.tls.domains=cloud.dsprojects.pl'
+      ## Middleware
+      - 'traefik.http.routers.nextcloud.middlewares=nextcloud-mw'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.SSLRedirect=true'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.SSLHost=cloud.dsprojects.pl'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.SSLForceHost=true'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.STSSeconds=315360000'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.STSIncludeSubdomains=true'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.STSPreload=true'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.forceSTSHeader=true'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.frameDeny=true'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.contentTypeNosniff=true'
+      - 'traefik.http.middlewares.nextcloud-mw.headers.browserXSSFilter=true'
+      - "traefik.http.middlewares.nextcloud-mw.headers.customFrameOptionsValue='allow-from https://cloud.dsprojects.pl'"
+      ## HTTP Service
+      - 'traefik.http.routers.nextcloud.service=nextcloud-svc'
+      - 'traefik.http.services.nextcloud-svc.loadBalancer.server.port=9095'
+      - 'traefik.http.routers.nextcloud-insecure.entryPoints=http'
+      - 'traefik.http.routers.nextcloud-insecure.rule=Host(`cloud.dsprojects.pl`)'
+      - 'traefik.http.routers.nextcloud-insecure.middlewares=nextcloud-insecure-mw'
+      - 'traefik.http.middlewares.nextcloud-insecure-mw.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.nextcloud-insecure-mw.redirectscheme.permanent=false'
+      - 'traefik.http.routers.nextcloud-insecure.service=noop@internal'
+    environment:
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASS}
+      - POSTGRES_HOST=postgres
+      - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_USER}
+      - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_PASS}
+      - REDIS_HOST=redis
+      - NEXTCLOUD_TRUSTED_DOMAINS=cloud.dsprojects.pl
+      - TRUSTED_PROXIES=172.17.0.0/16
+    volumes:
+      - nextcloud-www:/var/www/html
+
 volumes:
   traefik-ssl-certs:
+    driver: local
+  nextcloud-db:
+    driver: local
+  redis:
+    driver: local
+  nextcloud-www:
     driver: local
