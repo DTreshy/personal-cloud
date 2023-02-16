@@ -23,14 +23,14 @@ services:
       - 443:443
     env_file: .env
     labels:
-      - traefik.enable: true
-      - traefik.http.routers.traefik_https.rule: Host(`traefik.dsprojects.pl`)
-      - traefik.http.routers.traefik_https.entrypoints: https
-      - traefik.http.routers.traefik_https.tls: true
-      - traefik.http.routers.traefik_https.tls.certResolver: staging
-      - traefik.http.routers.traefik_https.service: api@internal
-      - traefik.http.routers.traefik_https.middlewares: basic-auth-global
-      - traefik.http.middlewares.basic-auth-global.basicauth.users: ${TRAEFIK_USER}:${TRAEFIK_PASS}
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.traefik_https.rule=Host(`traefik.dsprojects.pl`)'
+      - 'traefik.http.routers.traefik_https.entrypoints=https'
+      - 'traefik.http.routers.traefik_https.tls=true'
+      - 'traefik.http.routers.traefik_https.tls.certResolver=staging'
+      - 'traefik.http.routers.traefik_https.service=api@internal'
+      - 'traefik.http.routers.traefik_https.middlewares=basic-auth-global'
+      - 'traefik.http.middlewares.basic-auth-global.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASS}'
     command:
       - --metrics.prometheus.addrouterslabels=true
 
