@@ -8,7 +8,7 @@
   # Defines a default docker network to use for connections to all
   # containers.  This option can be overridden on a container basis
   # with the traefik.docker.network label.
-  network = "traefik_proxy"
+  network = "traefik"
 
   # Expose containers by default through Traefik. If set to false,
   # containers that don't have a traefik.enable=true label will be

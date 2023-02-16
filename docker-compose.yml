@@ -31,24 +31,6 @@ services:
       - --experimental.hub=true
       - --hub.tls.insecure=true
       - --metrics.prometheus.addrouterslabels=true
-    networks:
-      - traefik_proxy
-
-  hub-agent:
-    image: ghcr.io/traefik/hub-agent-traefik:v1.0.0
-    pull_policy: always
-    container_name: hub-agent
-    restart: "on-failure"
-    command:
-      - run
-      - --hub.token=db6c6294-3e93-4042-b199-76092657f12a
-      - --auth-server.advertise-url=http://hub-agent
-      - --traefik.host=traefik
-      - --traefik.tls.insecure=true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    depends_on:
-      - traefik
 
   jellyfin:
     container_name: jellyfin
@@ -65,7 +47,7 @@ services:
       #### Entry point where Jellyfin is accessible via
       #### Change secure to https in the line below to have accessible without needing to specify a port and change the SSLHost option below
       - 'traefik.http.routers.jellyfin.entryPoints=https'
-      - "traefik.docker.network=traefik_proxy"
+      - "traefik.docker.network=traefik"
       #### Host or Path where Jellyfin is accessible
       #### Remove (or change) this rule if you'd rather have Jellyfin accessible at a PathPrefix URI
       - 'traefik.http.routers.jellyfin.rule=Host(`jellyfin.dsprojects.pl`)' # OPTIONAL: && PathPrefix(`/jellyfin`)
@@ -115,12 +97,6 @@ services:
       - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.scheme=https'
       - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.jellyfin-insecure.service=noop@internal'
-    networks:
-      - traefik_proxy
-
-networks:
-  traefik_proxy:
-    driver: bridge
 
 volumes:
   traefik-ssl-certs:
