@@ -61,8 +61,6 @@
         # If you are using DNS for LetsEncrypt, you can set a wildcard.
         # Include all possible hostnames of this server.
         #sans = ["*.DOMAIN_NAME"]
-  # Alternate HTTPS Port (for services - accepts both HTTP and HTTP by not defining a TLS configuration here)
-  [entryPoints.secure]
 
 # Enable ACME (Let's Encrypt): automatic SSL.
 [certificatesresolvers.leresolver.acme]

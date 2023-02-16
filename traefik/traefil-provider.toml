@@ -1,7 +1,7 @@
 [http]
   [http.services]
-    [http.services.jellyfin-svc]
-      [[http.services.jellyfin-svc.loadBalancer.servers]]
+    [http.services.jellyfin]
+      [[http.services.jellyfin.loadBalancer.servers]]
         url = "http://192.168.50.35:8096"
 # Set secure options by disabling insecure older TLS/SSL versions
 # and insecure ciphers. SNIStrict disabled leaves TLS1.0 open.
