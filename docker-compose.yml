@@ -133,6 +133,7 @@ services:
   postgres:
     restart: always
     image: postgres:latest
+    container_name: postgres
     networks:
       - nextcloud
     environment:
@@ -144,6 +145,7 @@ services:
 
   redis:
     image: redis:latest
+    container_name: redis
     restart: always
     networks:
       - nextcloud
@@ -152,6 +154,7 @@ services:
 
   nextcloud:
     image: nextcloud:latest
+    container_name: nextcloud
     restart: always
     networks:
       - nextcloud
