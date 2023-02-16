@@ -96,6 +96,57 @@ services:
       - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.jellyfin-insecure.service=noop@internal'
 
+  
+  transmission:
+    container_name: transmission
+    image: linuxserver/transmission
+    restart: unless-stopped
+    ports:
+      - "51413:51413"
+      - "51413:51413/udp"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Warsaw
+      - USER=${TRANSMISSION_USER}
+      - PASS=${TRANSMISSION_PASS}
+    volumes:
+      - ./transmission/config:/config
+      - ./transmission/downloads:/downloads
+      - ./transmission/watch:/watch
+    labels:
+      - 'traefik.enable=true'
+      ## HTTP Router
+      - 'traefik.http.routers.transmission.entryPoints=https'
+      - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.transmission.tls=true'
+      - 'traefik.http.routers.transmission.tls.certResolver=leresolver'
+      - 'traefik.http.routers.transmission.tls.domains=transmission.dsprojects.pl'
+      ## Middleware
+      - 'traefik.http.routers.transmission.middlewares=jellyfin-mw'
+      - 'traefik.http.middlewares.transmission-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+      - 'traefik.http.middlewares.transmission-mw.headers.SSLRedirect=true'
+      - 'traefik.http.middlewares.transmission-mw.headers.SSLHost=jellyfin.dsprojects.pl'
+      - 'traefik.http.middlewares.transmission-mw.headers.SSLForceHost=true'
+      - 'traefik.http.middlewares.transmission-mw.headers.STSSeconds=315360000'
+      - 'traefik.http.middlewares.transmission-mw.headers.STSIncludeSubdomains=true'
+      - 'traefik.http.middlewares.transmission-mw.headers.STSPreload=true'
+      - 'traefik.http.middlewares.transmission-mw.headers.forceSTSHeader=true'
+      - 'traefik.http.middlewares.transmission-mw.headers.frameDeny=true'
+      - 'traefik.http.middlewares.transmission-mw.headers.contentTypeNosniff=true'
+      - 'traefik.http.middlewares.jellyfin-mw.headers.browserXSSFilter=true'
+      - "traefik.http.middlewares.transmission-mw.headers.customFrameOptionsValue='allow-from https://transmission.dsprojects.pl'"
+      ## HTTP Service
+      - 'traefik.http.routers.transmission.service=transmission-svc'
+      - 'traefik.http.services.transmission-svc.loadBalancer.server.port=9091'
+      - 'traefik.http.services.transmission-svc.loadBalancer.passHostHeader=true'
+      - 'traefik.http.routers.transmission-insecure.entryPoints=http'
+      - 'traefik.http.routers.transmission-insecure.rule=Host(`transmission.dsprojects.pl`)'
+      - 'traefik.http.routers.transmission-insecure.middlewares=transmission-insecure-mw'
+      - 'traefik.http.middlewares.transmission-insecure-mw.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.transmission-insecure-mw.redirectscheme.permanent=false'
+      - 'traefik.http.routers.transmission-insecure.service=noop@internal'
+
 volumes:
   traefik-ssl-certs:
     driver: local

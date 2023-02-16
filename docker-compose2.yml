@@ -2,49 +2,6 @@ version: "3.3"
 
 services:
 
-    certbot:
-        image: certbot/certbot
-        container_name: certbot
-        volumes: 
-            - ./certbot/www/:/var/www/certbot/:rw
-            - ./certbot/conf/:/etc/letsencrypt/:rw
-        command: certonly --webroot -w /var/www/certbot --rsa-key-size 4096 --force-renewal --email szczukowski.damian@gmail.com -d dsprojects.pl -d www.dsprojects.pl -d transmission.dsprojects.pl -d cloud.dsprojects.pl -d jellyfin.dsprojects.pl --agree-tos
-        networks:
-            - certbot_network
-        depends_on:
-            - nginx
-
-    nginx:
-        container_name: nginx
-        image: nginx:1.23.3-alpine
-        restart: unless-stopped
-        ports:
-            - 80:80
-            - 443:443
-        volumes:
-            - ./nginx/conf.d/:/etc/nginx/conf.d/
-            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-            - ./certbot/www:/var/www/certbot/:ro
-            - ./certbot/conf/:/etc/nginx/ssl/:ro
-        networks:
-            - nginx_network
-            - certbot_network
-        depends_on:
-            - transmission
-            - jellyfin
-    
-    jellyfin:
-        container_name: jellyfin
-        image: jellyfin/jellyfin
-        restart: unless-stopped
-        user: 1000:1000
-        volumes:
-        - ./jellyfin/config:/config
-        - ./jellyfin/cache:/cache
-        - ./jellyfin/media/:/media
-        networks:
-            - nginx_network
-
     transmission:
         container_name: transmission
         image: linuxserver/transmission
