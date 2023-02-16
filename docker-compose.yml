@@ -125,7 +125,7 @@ services:
       - 'traefik.http.routers.transmission.middlewares=transmission-mw'
       - 'traefik.http.middlewares.transmission-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
       - 'traefik.http.middlewares.transmission-mw.headers.SSLRedirect=true'
-      - 'traefik.http.middlewares.transmission-mw.headers.SSLHost=jellyfin.dsprojects.pl'
+      - 'traefik.http.middlewares.transmission-mw.headers.SSLHost=transmission.dsprojects.pl'
       - 'traefik.http.middlewares.transmission-mw.headers.SSLForceHost=true'
       - 'traefik.http.middlewares.transmission-mw.headers.STSSeconds=315360000'
       - 'traefik.http.middlewares.transmission-mw.headers.STSIncludeSubdomains=true'
@@ -133,7 +133,7 @@ services:
       - 'traefik.http.middlewares.transmission-mw.headers.forceSTSHeader=true'
       - 'traefik.http.middlewares.transmission-mw.headers.frameDeny=true'
       - 'traefik.http.middlewares.transmission-mw.headers.contentTypeNosniff=true'
-      - 'traefik.http.middlewares.jellyfin-mw.headers.browserXSSFilter=true'
+      - 'traefik.http.middlewares.transmission-mw.headers.browserXSSFilter=true'
       - "traefik.http.middlewares.transmission-mw.headers.customFrameOptionsValue='allow-from https://transmission.dsprojects.pl'"
       ## HTTP Service
       - 'traefik.http.routers.transmission.service=transmission-svc'
