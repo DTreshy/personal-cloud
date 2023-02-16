@@ -23,24 +23,11 @@
   insecure = true
 
 [providers]
-  # Connection to docker host system (docker.sock)
-  # Attach labels to your containers and let Traefik do the rest!
-  # Traefik works with both Docker (standalone) Engine and Docker Swarm Mode.
-  # See: https://docs.traefik.io/providers/docker/
   [providers.docker]
-    # Traefik requires access to the docker socket to get its dynamic
-    # configuration.
     endpoint = "unix:///var/run/docker.sock"
   [providers.file]
     filename = "/traefik-provider.toml"
 
-
-# EntryPoints are the network entry points into Traefik. They define
-# the port which will receive the packets, and whether to listen for
-# TCP or UDP.
-# See: https://docs.traefik.io/routing/entrypoints/
-# NOTE: If a TLS section (i.e. any of its fields) is defined in your docker-compose.yml file,
-# then the default configuration does not apply at all.
 [entryPoints]
   # Standard HTTP redirects to HTTPS
   [entryPoints.http]
@@ -57,9 +44,6 @@
       certResolver = "leresolver"
       [[entryPoints.https.http.tls.domains]]
         main = "dsprojects.pl"
-        # SANS are any other hostnames which Traefik should obtain a certificate for.
-        # If you are using DNS for LetsEncrypt, you can set a wildcard.
-        # Include all possible hostnames of this server.
         sans = ["transmission.dsprojects.pl", "jellyfin.dsprojects.pl"]
 
 # Enable ACME (Let's Encrypt): automatic SSL.
@@ -72,9 +56,12 @@
     delayBeforeCheck = 0
     resolvers = ["8.8.8.8:53"]
 
+[certificatesResolvers.staging.acme]
+  email = "szczukowski.damian@gmail.com"
+  storage = "acme.json"
+  caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
   [certificatesResolvers.staging.acme.dnsChallenge]
     provider = "ovh"
-    caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
     delayBeforeCheck = 0
     resolvers = ["8.8.8.8:53"]
 
