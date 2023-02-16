@@ -79,4 +79,7 @@
     # making the ACME request. Ideally a DNS server that isn't going to cache an old entry.
     resolvers = ["8.8.8.8:53"]
 
+[accessLog]
+  filePath = "/access.log"
+
 [retry]

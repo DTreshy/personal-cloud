@@ -17,6 +17,7 @@ services:
       - ./traefik/acme.json:/acme.json
       # Log File (optional)
       - ./traefik/traefik.log:/traefik.log
+      - ./traefik/access.log:/access.log
       - traefik-ssl-certs:/ssl-certs
     ports:
       # The Web UI (enabled by --api.insecure=true in traefik.toml)
