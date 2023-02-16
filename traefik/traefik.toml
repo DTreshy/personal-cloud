@@ -63,7 +63,6 @@
         #sans = ["*.DOMAIN_NAME"]
   # Alternate HTTPS Port (for services - accepts both HTTP and HTTP by not defining a TLS configuration here)
   [entryPoints.secure]
-    address = ":443"
 
 # Enable ACME (Let's Encrypt): automatic SSL.
 [certificatesresolvers.leresolver.acme]
