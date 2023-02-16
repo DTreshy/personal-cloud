@@ -85,7 +85,7 @@ services:
       - "traefik.http.middlewares.jellyfin-mw.headers.customFrameOptionsValue='allow-from https://jellyfin.dsprojects.pl'"
       ## HTTP Service
       # We define the port here as a port is required, but note that the service is pointing to the service defined in @file
-      - 'traefik.http.routers.jellyfin.service=traefik-personal-cloud@docker'
+      - 'traefik.http.routers.jellyfin.service=traefik-personal-cloud'
       - 'traefik.http.services.traefik-personal-cloud.passHostHeader=true'
       ## Redirection of HTTP on port 9999 to HTTPS on port 9999 (consistent protocol)
       - 'traefik.http.routers.jellyfin-insecure.entryPoints=http'
@@ -136,7 +136,7 @@ services:
       - 'traefik.http.middlewares.transmission-mw.headers.browserXSSFilter=true'
       - "traefik.http.middlewares.transmission-mw.headers.customFrameOptionsValue='allow-from https://transmission.dsprojects.pl'"
       ## HTTP Service
-      - 'traefik.http.routers.transmission.service=traefik-personal-cloud@docker'
+      - 'traefik.http.routers.transmission.service=traefik-personal-cloud'
       - 'traefik.http.routers.transmission-insecure.entryPoints=http'
       - 'traefik.http.routers.transmission-insecure.rule=Host(`transmission.dsprojects.pl`)'
       - 'traefik.http.routers.transmission-insecure.middlewares=transmission-insecure-mw'
