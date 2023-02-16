@@ -30,10 +30,9 @@ services:
     container_name: 'jellyfin'
     user: 1000:1000
     volumes:
-      - /path/to/config:/config
-      - /path/to/cache:/cache
-      # Update this configuration as desired
-      - /path/to/media:/media
+      - ./jellyfin/config:/config
+      - ./jellyfin/cache:/cache
+      - ./jellyfin/media/:/media
     restart: always
     labels:
       - 'traefik.enable=true'
