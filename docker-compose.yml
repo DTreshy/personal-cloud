@@ -91,7 +91,6 @@ services:
       - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.jellyfin-insecure.service=noop@internal'
 
-  networks:
-    traefik_proxy:
-      driver:
-        - bridge
+networks:
+  traefik_proxy:
+    driver: bridge
