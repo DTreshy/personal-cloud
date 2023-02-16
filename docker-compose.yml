@@ -96,7 +96,6 @@ services:
       - 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.jellyfin-insecure.service=noop@internal'
 
-  
   transmission:
     container_name: transmission
     image: linuxserver/transmission
@@ -123,7 +122,7 @@ services:
       - 'traefik.http.routers.transmission.tls.certResolver=leresolver'
       - 'traefik.http.routers.transmission.tls.domains=transmission.dsprojects.pl'
       ## Middleware
-      - 'traefik.http.routers.transmission.middlewares=jellyfin-mw'
+      - 'traefik.http.routers.transmission.middlewares=transmission-mw'
       - 'traefik.http.middlewares.transmission-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
       - 'traefik.http.middlewares.transmission-mw.headers.SSLRedirect=true'
       - 'traefik.http.middlewares.transmission-mw.headers.SSLHost=jellyfin.dsprojects.pl'
