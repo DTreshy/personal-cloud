@@ -29,6 +29,11 @@
   [providers.file]
     filename = "/traefik-provider.toml"
 
+[[tls.certificates]]
+  certFile = "/ssl-certs/domain.cert"
+  keyFile = "/ssl-certs/domain.key"
+  stores = ["default"]
+
 [entryPoints]
   # Standard HTTP redirects to HTTPS
   [entryPoints.http]
