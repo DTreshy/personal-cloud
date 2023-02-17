@@ -161,6 +161,7 @@ services:
     depends_on:
       - redis
       - postgres
+    network_mode: "host" 
     labels:
       - 'traefik.enable=true'
       ## HTTP Router
@@ -238,6 +239,7 @@ services:
       GF_INSTALL_PLUGINS: grafana-piechart-panel
     networks:
       - monitoring
+    network_mode: "host" 
     labels:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
