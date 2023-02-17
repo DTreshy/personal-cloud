@@ -256,7 +256,6 @@ services:
       - 'traefik.http.routers.grafana.entrypoints=https'
       - 'traefik.http.routers.grafana.tls=true'
       - 'traefik.http.routers.grafana.tls.certResolver=leresolver'
-      - 'traefik.http.routers.grafana.grafana'
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
       - 'traefik.http.routers.grafana.middlewares=basic-auth-global'
 
@@ -274,8 +273,6 @@ volumes:
 
 networks:
   nextcloud:
-    driver: bridge
-  traefik:
     driver: bridge
   monitoring:
     driver: bridge
