@@ -141,6 +141,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.postgres.entryPoints=local'
       - "traefik.http.routers.postgres.rule=Host(`postgres.localhost`)"
       - "traefik.http.routers.postgres.service=postgres"
       - "traefik.http.services.postgres.loadbalancer.server.port=5432"
@@ -154,6 +155,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.redis.entryPoints=local'
       - "traefik.http.routers.redis.rule=Host(`redis.localhost`)"
       - "traefik.http.routers.redis.service=redis"
       - "traefik.http.services.redis.loadbalancer.server.port=6379"
@@ -224,6 +226,7 @@ services:
     labels:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.prometheus.entryPoints=local'
       - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
       - "traefik.http.routers.prometheus.service=prometheus"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"

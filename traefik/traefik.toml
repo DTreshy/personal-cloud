@@ -36,6 +36,8 @@
   stores = ["default"]
 
 [entryPoints]
+  [entryPoints.local]
+    address = ":9999"
   # Standard HTTP redirects to HTTPS
   [entryPoints.http]
     address = ":80"
