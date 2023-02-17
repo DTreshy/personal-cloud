@@ -142,7 +142,6 @@ services:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
       - 'traefik.http.routers.postgres.entryPoints=local'
-      - "traefik.http.routers.postgres.rule=Host(`postgres.localhost`)"
       - "traefik.http.routers.postgres.service=postgres"
       - "traefik.http.services.postgres.loadbalancer.server.port=5432"
     volumes:
@@ -156,7 +155,6 @@ services:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
       - 'traefik.http.routers.redis.entryPoints=local'
-      - "traefik.http.routers.redis.rule=Host(`redis.localhost`)"
       - "traefik.http.routers.redis.service=redis"
       - "traefik.http.services.redis.loadbalancer.server.port=6379"
     volumes:
@@ -203,10 +201,10 @@ services:
       - POSTGRES_DB=nextcloud
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASS}
-      - POSTGRES_HOST=postgres.localhost
+      - POSTGRES_HOST=postgres
       - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_USER}
       - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_PASS}
-      - REDIS_HOST=redis.localhost
+      - REDIS_HOST=redis
       - NEXTCLOUD_TRUSTED_DOMAINS=cloud.dsprojects.pl
       - TRUSTED_PROXIES=172.0.0.0/8
     volumes:
@@ -227,7 +225,6 @@ services:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
       - 'traefik.http.routers.prometheus.entryPoints=local'
-      - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
       - "traefik.http.routers.prometheus.service=prometheus"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
   
@@ -243,7 +240,7 @@ services:
     environment:
       GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: "true"
       GF_INSTALL_PLUGINS: grafana-piechart-panel
-    network_mode: "host" 
+    network_mode: "host"
     labels:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
