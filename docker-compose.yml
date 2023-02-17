@@ -134,8 +134,6 @@ services:
     restart: always
     image: postgres:latest
     container_name: postgres
-    networks:
-      - nextcloud
     environment:
     - POSTGRES_USER=${POSTGRES_USER}
     - POSTGRES_PASSWORD=${POSTGRES_PASS}
@@ -147,8 +145,6 @@ services:
     image: redis:latest
     container_name: redis
     restart: always
-    networks:
-      - nextcloud
     volumes:
       - redis:/var/lib/redis
 
@@ -156,12 +152,9 @@ services:
     image: nextcloud:latest
     container_name: nextcloud
     restart: always
-    networks:
-      - nextcloud
     depends_on:
       - redis
       - postgres
-    network_mode: "host" 
     labels:
       - 'traefik.enable=true'
       ## HTTP Router
@@ -216,8 +209,6 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention.size=512MB'
-    networks:
-      - monitoring
     labels:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
@@ -237,8 +228,6 @@ services:
     environment:
       GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: "true"
       GF_INSTALL_PLUGINS: grafana-piechart-panel
-    networks:
-      - monitoring
     network_mode: "host" 
     labels:
       - 'traefik.enable=true'
@@ -261,9 +250,3 @@ volumes:
     driver: local
   prometheus_data: {}
   grafana_data: {}
-
-networks:
-  nextcloud:
-    driver: bridge
-  monitoring:
-    driver: bridge
