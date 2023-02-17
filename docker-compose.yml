@@ -214,8 +214,7 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--storage.tsdb.retention.size=512MB'
     networks:
       - monitoring
     deploy:
@@ -238,42 +237,22 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
-    env_file:
-      - ./grafana/config.monitoring
+    environment:
+      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: "true"
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
     networks:
       - monitoring
     user: "104"
     deploy:
     labels:
       - 'traefik.enable=true'
-      ## HTTP Router
-      - 'traefik.http.routers.grafana.entryPoints=https'
-      - "traefik.docker.network=traefik"
       - 'traefik.http.routers.grafana.rule=Host(`grafana.dsprojects.pl`)'
+      - 'traefik.http.routers.grafana.entrypoints=https'
       - 'traefik.http.routers.grafana.tls=true'
       - 'traefik.http.routers.grafana.tls.certResolver=leresolver'
-      - 'traefik.http.routers.grafana.tls.domains=grafana.dsprojects.pl'
-      ## Middleware
-      - 'traefik.http.routers.grafana.middlewares=grafana-mw'
-      - 'traefik.http.middlewares.grafana-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
-      - 'traefik.http.middlewares.grafana-mw.headers.SSLRedirect=true'
-      - 'traefik.http.middlewares.grafana-mw.headers.SSLHost=grafana.dsprojects.pl'
-      - 'traefik.http.middlewares.grafana-mw.headers.SSLForceHost=true'
-      - 'traefik.http.middlewares.grafana-mw.headers.STSSeconds=315360000'
-      - 'traefik.http.middlewares.grafana-mw.headers.STSIncludeSubdomains=true'
-      - 'traefik.http.middlewares.grafana-mw.headers.STSPreload=true'
-      - 'traefik.http.middlewares.grafana-mw.headers.forceSTSHeader=true'
-      - 'traefik.http.middlewares.grafana-mw.headers.frameDeny=true'
-      - 'traefik.http.middlewares.grafana-mw.headers.contentTypeNosniff=true'
-      - 'traefik.http.middlewares.grafana-mw.headers.browserXSSFilter=true'
-      - "traefik.http.middlewares.grafana-mw.headers.customFrameOptionsValue='allow-from https://grafana.dsprojects.pl'"
-      ## HTTP Service
-      - 'traefik.http.routers.grafana-insecure.entryPoints=http'
-      - 'traefik.http.routers.grafana-insecure.rule=Host(`grafana.dsprojects.pl`)'
-      - 'traefik.http.routers.grafana-insecure.middlewares=grafana-insecure-mw'
-      - 'traefik.http.middlewares.grafana-insecure-mw.redirectscheme.scheme=https'
-      - 'traefik.http.middlewares.grafana-insecure-mw.redirectscheme.permanent=false'
-      - 'traefik.http.routers.grafana-insecure.service=noop@internal'
+      - 'traefik.http.routers.grafana.grafana'
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - 'traefik.http.routers.grafana.middlewares=basic-auth-global'
 
 volumes:
   traefik-ssl-certs:
