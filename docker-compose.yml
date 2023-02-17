@@ -204,6 +204,80 @@ services:
     volumes:
       - nextcloud-www:/var/www/html
 
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/config/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - monitoring
+    deploy:
+      labels:
+       - 'traefik.enable=true'
+       - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
+       - "traefik.http.routers.prometheus.service=prometheus"
+       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+       - "traefik.docker.network=traefik"
+      placement:
+        constraints:
+        - node.role==manager
+      restart_policy:
+        condition: on-failure
+  
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ./grafana/config.monitoring
+    networks:
+      - monitoring
+    user: "104"
+    deploy:
+    labels:
+      - 'traefik.enable=true'
+      ## HTTP Router
+      - 'traefik.http.routers.grafana.entryPoints=https'
+      - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.grafana.rule=Host(`grafana.dsprojects.pl`)'
+      - 'traefik.http.routers.grafana.tls=true'
+      - 'traefik.http.routers.grafana.tls.certResolver=leresolver'
+      - 'traefik.http.routers.grafana.tls.domains=grafana.dsprojects.pl'
+      ## Middleware
+      - 'traefik.http.routers.grafana.middlewares=grafana-mw'
+      - 'traefik.http.middlewares.grafana-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+      - 'traefik.http.middlewares.grafana-mw.headers.SSLRedirect=true'
+      - 'traefik.http.middlewares.grafana-mw.headers.SSLHost=grafana.dsprojects.pl'
+      - 'traefik.http.middlewares.grafana-mw.headers.SSLForceHost=true'
+      - 'traefik.http.middlewares.grafana-mw.headers.STSSeconds=315360000'
+      - 'traefik.http.middlewares.grafana-mw.headers.STSIncludeSubdomains=true'
+      - 'traefik.http.middlewares.grafana-mw.headers.STSPreload=true'
+      - 'traefik.http.middlewares.grafana-mw.headers.forceSTSHeader=true'
+      - 'traefik.http.middlewares.grafana-mw.headers.frameDeny=true'
+      - 'traefik.http.middlewares.grafana-mw.headers.contentTypeNosniff=true'
+      - 'traefik.http.middlewares.grafana-mw.headers.browserXSSFilter=true'
+      - "traefik.http.middlewares.grafana-mw.headers.customFrameOptionsValue='allow-from https://grafana.dsprojects.pl'"
+      ## HTTP Service
+      - 'traefik.http.routers.grafana-insecure.entryPoints=http'
+      - 'traefik.http.routers.grafana-insecure.rule=Host(`grafana.dsprojects.pl`)'
+      - 'traefik.http.routers.grafana-insecure.middlewares=grafana-insecure-mw'
+      - 'traefik.http.middlewares.grafana-insecure-mw.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.grafana-insecure-mw.redirectscheme.permanent=false'
+      - 'traefik.http.routers.grafana-insecure.service=noop@internal'
+    placement:
+      constraints:
+        - node.role == manager
+    restart_policy:
+      condition: on-failure
+
 volumes:
   traefik-ssl-certs:
     driver: local
@@ -213,7 +287,11 @@ volumes:
     driver: local
   nextcloud-www:
     driver: local
+  prometheus_data: {}
+  grafana_data: {}
 
 networks:
   nextcloud:
+    driver: bridge
+  monitoring:
     driver: bridge
