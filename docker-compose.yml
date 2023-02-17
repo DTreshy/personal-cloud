@@ -272,9 +272,6 @@ services:
       - 'traefik.http.middlewares.grafana-insecure-mw.redirectscheme.scheme=https'
       - 'traefik.http.middlewares.grafana-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.grafana-insecure.service=noop@internal'
-    placement:
-      constraints:
-        - node.role == manager
     restart_policy:
       condition: on-failure
 
