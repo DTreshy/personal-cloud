@@ -240,10 +240,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     environment:
-      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: "true"
       GF_INSTALL_PLUGINS: grafana-piechart-panel
-      GF_SECURITY_ADMIN_USER: ${GF_USER}
-      GF_SECURITY_ADMIN_PASSWORD: ${GF_PASS}
     labels:
       - 'traefik.enable=true'
       ## HTTP Router
