@@ -208,6 +208,7 @@ services:
       - NEXTCLOUD_TRUSTED_DOMAINS=cloud.dsprojects.pl
       - TRUSTED_PROXIES=172.0.0.0/8
       - OVERWRITEPROTOCOL=https
+      - OVERWRITEHOST=cloud.dsprojects.pl
     volumes:
       - nextcloud-www:/var/www/html
 
