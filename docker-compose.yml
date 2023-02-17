@@ -217,16 +217,13 @@ services:
       - '--storage.tsdb.retention.size=512MB'
     networks:
       - monitoring
-    deploy:
-      labels:
-       - 'traefik.enable=true'
-       - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
-       - "traefik.http.routers.prometheus.service=prometheus"
-       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
-       - "traefik.docker.network=traefik"
-      placement:
-        constraints:
-        - node.role==manager
+    labels:
+      - 'traefik.enable=true'
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
+      - "traefik.http.routers.prometheus.service=prometheus"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+      - "traefik.docker.network=traefik"
   
   grafana:
     image: grafana/grafana
@@ -242,10 +239,9 @@ services:
       GF_INSTALL_PLUGINS: grafana-piechart-panel
     networks:
       - monitoring
-    user: "104"
-    deploy:
     labels:
       - 'traefik.enable=true'
+      - "traefik.docker.network=traefik"
       - 'traefik.http.routers.grafana.rule=Host(`grafana.dsprojects.pl`)'
       - 'traefik.http.routers.grafana.entrypoints=https'
       - 'traefik.http.routers.grafana.tls=true'
