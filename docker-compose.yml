@@ -223,7 +223,6 @@ services:
       - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
       - "traefik.http.routers.prometheus.service=prometheus"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
-      - "traefik.docker.network=traefik"
   
   grafana:
     image: grafana/grafana
