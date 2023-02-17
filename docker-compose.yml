@@ -217,7 +217,6 @@ services:
       - '--storage.tsdb.retention.size=512MB'
     networks:
       - monitoring
-      - traefik
     labels:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
