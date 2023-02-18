@@ -337,7 +337,7 @@ services:
       - "traefik.http.middlewares.jackett-mw.headers.customFrameOptionsValue='allow-from https://jackett.dsprojects.pl'"
       ## HTTP Service
       - 'traefik.http.routers.jackett.service=jackett-svc'
-      - 'traefik.http.services.jackett-svc.loadBalancer.server.port=9091'
+      - 'traefik.http.services.jackett-svc.loadBalancer.server.port=9117'
       - 'traefik.http.routers.jackett-insecure.entryPoints=http'
       - 'traefik.http.routers.jackett-insecure.rule=Host(`jackett.dsprojects.pl`)'
       - 'traefik.http.routers.jackett-insecure.middlewares=jackett-insecure-mw'
