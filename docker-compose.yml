@@ -35,8 +35,6 @@ services:
       - jellyfin
       - transmission
       - nextcloud
-    command:
-      - --metrics.prometheus.addrouterslabels=true
 
   jellyfin:
     container_name: jellyfin

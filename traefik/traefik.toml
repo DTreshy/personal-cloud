@@ -79,5 +79,7 @@
 
 [metrics]
   [metrics.prometheus]
+    addRoutersLabels = true
+    entryPoint = "https"
 
 [retry]
