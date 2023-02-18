@@ -83,8 +83,8 @@ services:
     image: linuxserver/transmission
     restart: unless-stopped
     ports:
-      - "51413:51413"
-      - "51413:51413/udp"
+      - 51413:51413
+      - 51413:51413/udp
     environment:
       - PUID=1000
       - PGID=1000
