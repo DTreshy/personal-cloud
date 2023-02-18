@@ -309,8 +309,6 @@ services:
     volumes:
       - ./jackett:/config
       - /transmission/downloads/complete:/downloads
-    ports:
-      - 9117:9117
     restart: unless-stopped
     labels:
       - 'traefik.enable=true'
@@ -344,6 +342,101 @@ services:
       - 'traefik.http.middlewares.jackett-insecure-mw.redirectscheme.scheme=https'
       - 'traefik.http.middlewares.jackett-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.jackett-insecure.service=noop@internal'
+
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Rome
+    volumes:
+      - ./sonarr/config:/config
+      - .jellyfin//media/cartoons:/cartoons
+      - .jellyfin//media/shows:/shows
+      - ./transmission/downloads/complete:/downloads/complete
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+    labels:
+      - 'traefik.enable=true'
+      ## HTTP Router
+      - 'traefik.http.routers.sonarr.entryPoints=https'
+      - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.sonarr.rule=Host(`sonarr.dsprojects.pl`)'
+      - 'traefik.http.routers.sonarr.tls=true'
+      - 'traefik.http.routers.sonarr.tls.certResolver=leresolver'
+      - 'traefik.http.routers.sonarr.tls.domains=sonarr.dsprojects.pl'
+      ## Middleware
+      - 'traefik.http.routers.sonarr.middlewares=sonarr-mw'
+      - 'traefik.http.middlewares.sonarr-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+      - 'traefik.http.middlewares.sonarr-mw.headers.SSLRedirect=true'
+      - 'traefik.http.middlewares.sonarr-mw.headers.SSLHost=sonarr.dsprojects.pl'
+      - 'traefik.http.middlewares.sonarr-mw.headers.SSLForceHost=true'
+      - 'traefik.http.middlewares.sonarr-mw.headers.STSSeconds=315360000'
+      - 'traefik.http.middlewares.sonarr-mw.headers.STSIncludeSubdomains=true'
+      - 'traefik.http.middlewares.sonarr-mw.headers.STSPreload=true'
+      - 'traefik.http.middlewares.sonarr-mw.headers.forceSTSHeader=true'
+      - 'traefik.http.middlewares.sonarr-mw.headers.frameDeny=true'
+      - 'traefik.http.middlewares.sonarr-mw.headers.contentTypeNosniff=true'
+      - 'traefik.http.middlewares.sonarr-mw.headers.browserXSSFilter=true'
+      - "traefik.http.middlewares.sonarr-mw.headers.customFrameOptionsValue='allow-from https://sonarr.dsprojects.pl'"
+      ## HTTP Service
+      - 'traefik.http.routers.sonarr.service=sonarr-svc'
+      - 'traefik.http.services.sonarr-svc.loadBalancer.server.port=8989'
+      - 'traefik.http.routers.sonarr-insecure.entryPoints=http'
+      - 'traefik.http.routers.sonarr-insecure.rule=Host(`sonarr.dsprojects.pl`)'
+      - 'traefik.http.routers.sonarr-insecure.middlewares=sonarr-insecure-mw'
+      - 'traefik.http.middlewares.sonarr-insecure-mw.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.sonarr-insecure-mw.redirectscheme.permanent=false'
+      - 'traefik.http.routers.sonarr-insecure.service=noop@internal'
+
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Rome
+    volumes:
+      - ./radarr/config:/config
+      - ./transmission/downloads/complete:/downloads/complete
+      - .jellyfin//media/films:/films
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    labels:
+      - 'traefik.enable=true'
+      ## HTTP Router
+      - 'traefik.http.routers.radarr.entryPoints=https'
+      - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.radarr.rule=Host(`radarr.dsprojects.pl`)'
+      - 'traefik.http.routers.radarr.tls=true'
+      - 'traefik.http.routers.radarr.tls.certResolver=leresolver'
+      - 'traefik.http.routers.radarr.tls.domains=radarr.dsprojects.pl'
+      ## Middleware
+      - 'traefik.http.routers.radarr.middlewares=radarr-mw'
+      - 'traefik.http.middlewares.radarr-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+      - 'traefik.http.middlewares.radarr-mw.headers.SSLRedirect=true'
+      - 'traefik.http.middlewares.radarr-mw.headers.SSLHost=radarr.dsprojects.pl'
+      - 'traefik.http.middlewares.radarr-mw.headers.SSLForceHost=true'
+      - 'traefik.http.middlewares.radarr-mw.headers.STSSeconds=315360000'
+      - 'traefik.http.middlewares.radarr-mw.headers.STSIncludeSubdomains=true'
+      - 'traefik.http.middlewares.radarr-mw.headers.STSPreload=true'
+      - 'traefik.http.middlewares.radarr-mw.headers.forceSTSHeader=true'
+      - 'traefik.http.middlewares.radarr-mw.headers.frameDeny=true'
+      - 'traefik.http.middlewares.radarr-mw.headers.contentTypeNosniff=true'
+      - 'traefik.http.middlewares.radarr-mw.headers.browserXSSFilter=true'
+      - "traefik.http.middlewares.radarr-mw.headers.customFrameOptionsValue='allow-from https://radarr.dsprojects.pl'"
+      ## HTTP Service
+      - 'traefik.http.routers.radarr.service=radarr-svc'
+      - 'traefik.http.services.radarr-svc.loadBalancer.server.port=7878'
+      - 'traefik.http.routers.radarr-insecure.entryPoints=http'
+      - 'traefik.http.routers.radarr-insecure.rule=Host(`radarr.dsprojects.pl`)'
+      - 'traefik.http.routers.radarr-insecure.middlewares=radarr-insecure-mw'
+      - 'traefik.http.middlewares.radarr-insecure-mw.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.radarr-insecure-mw.redirectscheme.permanent=false'
+      - 'traefik.http.routers.radarr-insecure.service=noop@internal'
 
 volumes:
   traefik-ssl-certs:
