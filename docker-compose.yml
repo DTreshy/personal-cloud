@@ -221,6 +221,8 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention.size=512MB'
+    ports:
+      - 9090:9090
     labels:
       - 'traefik.enable=true'
       ## HTTP Router
@@ -310,6 +312,8 @@ services:
       - ./jackett:/config
       - /transmission/downloads/complete:/downloads
     restart: unless-stopped
+    ports:
+      - 9117:9117
     labels:
       - 'traefik.enable=true'
       ## HTTP Router
@@ -352,10 +356,12 @@ services:
       - TZ=Europe/Rome
     volumes:
       - ./sonarr/config:/config
-      - .jellyfin//media/cartoons:/cartoons
-      - .jellyfin//media/shows:/shows
+      - .jellyfin//media/cartoons:/dev/cartoons
+      - .jellyfin//media/shows:/dev/shows
       - ./transmission/downloads/complete:/downloads/complete
     restart: unless-stopped
+    ports:
+      - 8989:8989
     labels:
       - 'traefik.enable=true'
       ## HTTP Router
@@ -399,7 +405,7 @@ services:
     volumes:
       - ./radarr/config:/config
       - ./transmission/downloads/complete:/downloads/complete
-      - .jellyfin//media/films:/films
+      - .jellyfin//media/films:/dev/films
     ports:
       - 7878:7878
     restart: unless-stopped
