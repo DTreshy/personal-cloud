@@ -356,8 +356,8 @@ services:
       - TZ=Europe/Rome
     volumes:
       - ./sonarr/config:/config
-      - .jellyfin//media/cartoons:/dev/cartoons
-      - .jellyfin//media/shows:/dev/shows
+      - .jellyfin//media/cartoons:/defaults/cartoons
+      - .jellyfin//media/shows:/defaults/shows
       - ./transmission/downloads/complete:/downloads/complete
     restart: unless-stopped
     ports:
@@ -405,7 +405,7 @@ services:
     volumes:
       - ./radarr/config:/config
       - ./transmission/downloads/complete:/downloads/complete
-      - .jellyfin//media/films:/dev/films
+      - .jellyfin//media/films:/defaults/films
     ports:
       - 7878:7878
     restart: unless-stopped
