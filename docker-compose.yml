@@ -355,8 +355,6 @@ services:
       - .jellyfin//media/cartoons:/cartoons
       - .jellyfin//media/shows:/shows
       - ./transmission/downloads/complete:/downloads/complete
-    ports:
-      - 8989:8989
     restart: unless-stopped
     labels:
       - 'traefik.enable=true'
@@ -437,6 +435,53 @@ services:
       - 'traefik.http.middlewares.radarr-insecure-mw.redirectscheme.scheme=https'
       - 'traefik.http.middlewares.radarr-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.radarr-insecure.service=noop@internal'
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:develop
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Europe/Rome
+    ports:
+      - 5055:5055
+    volumes:
+      - ./jellyseerr_config:/app/config
+    restart: unless-stopped
+    depends_on:
+      - radarr
+      - sonarr
+    labels:
+      - 'traefik.enable=true'
+      ## HTTP Router
+      - 'traefik.http.routers.jellyseerr.entryPoints=https'
+      - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.dsprojects.pl`)'
+      - 'traefik.http.routers.jellyseerr.tls=true'
+      - 'traefik.http.routers.jellyseerr.tls.certResolver=leresolver'
+      - 'traefik.http.routers.jellyseerr.tls.domains=jellyseerr.dsprojects.pl'
+      ## Middleware
+      - 'traefik.http.routers.jellyseerr.middlewares=jellyseerr-mw'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.SSLRedirect=true'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.SSLHost=jellyseerr.dsprojects.pl'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.SSLForceHost=true'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.STSSeconds=315360000'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.STSIncludeSubdomains=true'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.STSPreload=true'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.forceSTSHeader=true'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.frameDeny=true'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.contentTypeNosniff=true'
+      - 'traefik.http.middlewares.jellyseerr-mw.headers.browserXSSFilter=true'
+      - "traefik.http.middlewares.jellyseerr-mw.headers.customFrameOptionsValue='allow-from https://jellyseerr.dsprojects.pl'"
+      ## HTTP Service
+      - 'traefik.http.routers.jellyseerr.service=jellyseerr-svc'
+      - 'traefik.http.services.jellyseerr-svc.loadBalancer.server.port=5055'
+      - 'traefik.http.routers.jellyseerr-insecure.entryPoints=http'
+      - 'traefik.http.routers.jellyseerr-insecure.rule=Host(`jellyseerr.dsprojects.pl`)'
+      - 'traefik.http.routers.jellyseerr-insecure.middlewares=jellyseerr-insecure-mw'
+      - 'traefik.http.middlewares.jellyseerr-insecure-mw.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.jellyseerr-insecure-mw.redirectscheme.permanent=false'
+      - 'traefik.http.routers.jellyseerr-insecure.service=noop@internal'
 
 volumes:
   traefik-ssl-certs:
