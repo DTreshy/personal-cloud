@@ -489,6 +489,52 @@ services:
       - 'traefik.http.middlewares.jellyseerr-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.jellyseerr-insecure.service=noop@internal'
 
+  bazarr:
+    image: linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Rome
+    volumes:
+      - ./bazarr/config:/config
+      - ./jellyfin/media/films:/films
+      - ./jellyfin/media/shows:/shows
+      - ./jellyfin/media/cartoons:/cartoons
+    restart: unless-stopped
+    labels:
+      - 'traefik.enable=true'
+      ## HTTP Router
+      - 'traefik.http.routers.bazarr.entryPoints=https'
+      - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.bazarr.rule=Host(`bazarr.dsprojects.pl`)'
+      - 'traefik.http.routers.bazarr.tls=true'
+      - 'traefik.http.routers.bazarr.tls.certResolver=leresolver'
+      - 'traefik.http.routers.bazarr.tls.domains=bazarr.dsprojects.pl'
+      ## Middleware
+      - 'traefik.http.routers.bazarr.middlewares=bazarr-mw'
+      - 'traefik.http.middlewares.bazarr-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+      - 'traefik.http.middlewares.bazarr-mw.headers.SSLRedirect=true'
+      - 'traefik.http.middlewares.bazarr-mw.headers.SSLHost=bazarr.dsprojects.pl'
+      - 'traefik.http.middlewares.bazarr-mw.headers.SSLForceHost=true'
+      - 'traefik.http.middlewares.bazarr-mw.headers.STSSeconds=315360000'
+      - 'traefik.http.middlewares.bazarr-mw.headers.STSIncludeSubdomains=true'
+      - 'traefik.http.middlewares.bazarr-mw.headers.STSPreload=true'
+      - 'traefik.http.middlewares.bazarr-mw.headers.forceSTSHeader=true'
+      - 'traefik.http.middlewares.bazarr-mw.headers.frameDeny=true'
+      - 'traefik.http.middlewares.bazarr-mw.headers.contentTypeNosniff=true'
+      - 'traefik.http.middlewares.bazarr-mw.headers.browserXSSFilter=true'
+      - "traefik.http.middlewares.bazarr-mw.headers.customFrameOptionsValue='allow-from https://bazarr.dsprojects.pl'"
+      ## HTTP Service
+      - 'traefik.http.routers.bazarr.service=bazarr-svc'
+      - 'traefik.http.services.bazarr-svc.loadBalancer.server.port=6767'
+      - 'traefik.http.routers.bazarr-insecure.entryPoints=http'
+      - 'traefik.http.routers.bazarr-insecure.rule=Host(`bazarr.dsprojects.pl`)'
+      - 'traefik.http.routers.bazarr-insecure.middlewares=bazarr-insecure-mw'
+      - 'traefik.http.middlewares.bazarr-insecure-mw.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.bazarr-insecure-mw.redirectscheme.permanent=false'
+      - 'traefik.http.routers.bazarr-insecure.service=noop@internal'
+
 volumes:
   traefik-ssl-certs:
     driver: local
