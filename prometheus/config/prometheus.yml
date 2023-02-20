@@ -24,10 +24,10 @@ scrape_configs:
 
     # metrics_path defaults to '/metrics'
     # scheme defaults to 'http'.
-
+    scheme: https
     static_configs:
       - targets: 
-        - "traefik"
+        - "traefik.dsprojects.pl"
     basic_auth:
       username: ${TRAEFIK_USER}
       password: ${TRAEFIK_PASS}
