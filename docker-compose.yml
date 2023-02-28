@@ -504,6 +504,51 @@ services:
       - "traefik.http.routers.node-exporter.service=node-exporter"
       - "traefik.http.services.node-exporter.loadbalancer.server.port=9100"
 
+  openvpn-as:
+    container_name: openvpn-as
+    restart: always
+    image: linuxserver/openvpn-as:latest
+    volumes:
+      - ./openvpn-as/config:/config 
+    enviroment:
+      - INTERFACE=eth0
+      - PGID=1000
+      - PUID=1000
+    privileged: true
+    labels:
+      - 'traefik.enable=true'
+      ## HTTP Router
+      - 'traefik.http.routers.openvpn.entryPoints=https'
+      - "traefik.docker.network=traefik"
+      - 'traefik.http.routers.openvpn.rule=Host(`vpn.dsprojects.pl`)'
+      - 'traefik.http.routers.openvpn.tls=true'
+      - 'traefik.http.routers.openvpn.tls.certResolver=leresolver'
+      - 'traefik.http.routers.openvpn.tls.domains=vpn.dsprojects.pl'
+      ## Middleware
+      - 'traefik.http.routers.openvpn.middlewares=openvpn-mw'
+      - 'traefik.http.middlewares.openvpn-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex'
+      - 'traefik.http.middlewares.openvpn-mw.headers.SSLRedirect=true'
+      - 'traefik.http.middlewares.openvpn-mw.headers.SSLHost=vpn.dsprojects.pl'
+      - 'traefik.http.middlewares.openvpn-mw.headers.SSLForceHost=true'
+      - 'traefik.http.middlewares.openvpn-mw.headers.STSSeconds=315360000'
+      - 'traefik.http.middlewares.openvpn-mw.headers.STSIncludeSubdomains=true'
+      - 'traefik.http.middlewares.openvpn-mw.headers.STSPreload=true'
+      - 'traefik.http.middlewares.openvpn-mw.headers.forceSTSHeader=true'
+      - 'traefik.http.middlewares.openvpn-mw.headers.frameDeny=true'
+      - 'traefik.http.middlewares.openvpn-mw.headers.contentTypeNosniff=true'
+      - 'traefik.http.middlewares.openvpn-mw.headers.browserXSSFilter=true'
+      - "traefik.http.middlewares.openvpn-mw.headers.customFrameOptionsValue='allow-from https://vpn.dsprojects.pl'"
+      ## HTTP Service
+      - 'traefik.http.routers.openvpn.service=openvpn-svc'
+      - 'traefik.http.services.openvpn-svc.loadBalancer.server.port=943'
+      - 'traefik.http.routers.openvpn-insecure.entryPoints=http'
+      - 'traefik.http.routers.openvpn-insecure.rule=Host(`vpn.dsprojects.pl`)'
+      - 'traefik.http.routers.openvpn-insecure.middlewares=openvpn-insecure-mw'
+      - 'traefik.http.middlewares.openvpn-insecure-mw.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.openvpn-insecure-mw.redirectscheme.permanent=false'
+      - 'traefik.http.routers.openvpn-insecure.service=noop@internal'
+
+
 volumes:
   traefik-ssl-certs:
     driver: local
