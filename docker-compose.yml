@@ -499,8 +499,9 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     command:
-      - '--housekeeping_interval=60s'
-      - '--docker_only'
+      - '--housekeeping_interval=15s'
+      - '--docker_only=true'
+      - '--disable_metrics=disk,tcp,udp,percpu,sched,process'
     labels:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
