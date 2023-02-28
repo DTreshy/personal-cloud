@@ -31,3 +31,9 @@ scrape_configs:
     basic_auth:
       username: ${TRAEFIK_USER}
       password: ${TRAEFIK_PASS}
+
+   - job_name: cadvisor
+     scrape_interval: 5s
+     static_configs:
+     - targets:
+       - http://cadvisor:9399
