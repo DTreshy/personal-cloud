@@ -36,4 +36,4 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
     - targets:
-      - "cadvisor-personal-cloud:9999"
+      - "cadvisor:9399"
