@@ -32,8 +32,6 @@ scrape_configs:
       username: ${TRAEFIK_USER}
       password: ${TRAEFIK_PASS}
 
-  - job_name: "cadvisor"
-    scrape_interval: 5s
+  - job_name: node
     static_configs:
-    - targets:
-      - "cadvisor:8080"
+      - targets: ['node-exporter:9100']

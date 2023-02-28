@@ -489,25 +489,20 @@ services:
       - 'traefik.http.middlewares.jellyseerr-insecure-mw.redirectscheme.permanent=false'
       - 'traefik.http.routers.jellyseerr-insecure.service=noop@internal'
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
-    privileged: true
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
     volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
       - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    command:
-      - '--housekeeping_interval=40s'
-      - '--docker_only=true'
-      - "--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,accelerator,hugetlb,resctrl"
     labels:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
-      - 'traefik.http.routers.cadvisor.entryPoints=local'
-      - "traefik.http.routers.cadvisor.service=cadvisor"
-      - "traefik.http.services.cadvisor.loadbalancer.server.port=8080"
+      - 'traefik.http.routers.node-exporter.entryPoints=local'
+      - "traefik.http.routers.node-exporter.service=node-exporter"
+      - "traefik.http.services.node-exporter.loadbalancer.server.port=8080"
 
 volumes:
   traefik-ssl-certs:
