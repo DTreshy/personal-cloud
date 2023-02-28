@@ -502,7 +502,7 @@ services:
       - "traefik.docker.network=traefik"
       - 'traefik.http.routers.node-exporter.entryPoints=local'
       - "traefik.http.routers.node-exporter.service=node-exporter"
-      - "traefik.http.services.node-exporter.loadbalancer.server.port=8080"
+      - "traefik.http.services.node-exporter.loadbalancer.server.port=9100"
 
 volumes:
   traefik-ssl-certs:
