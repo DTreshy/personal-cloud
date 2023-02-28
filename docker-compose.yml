@@ -217,8 +217,6 @@ services:
     volumes:
       - ./prometheus/config/:/etc/prometheus/
       - prometheus_data:/prometheus
-    networks:
-      - monitoring_monitoring
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -502,7 +500,3 @@ volumes:
     driver: local
   prometheus_data: {}
   grafana_data: {}
-
-networks:
-  monitoring_monitoring:
-    external: true
