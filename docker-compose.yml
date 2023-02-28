@@ -510,7 +510,7 @@ services:
     image: linuxserver/openvpn-as:latest
     volumes:
       - ./openvpn-as/config:/config 
-    enviroment:
+    environment:
       - INTERFACE=eth0
       - PGID=1000
       - PUID=1000
