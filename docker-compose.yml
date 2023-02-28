@@ -501,7 +501,7 @@ services:
     command:
       - '--housekeeping_interval=40s'
       - '--docker_only=true'
-      - "--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,accelerator,hugetlb,cpu_topology,resctrl"
+      - "--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,accelerator,hugetlb,resctrl"
     labels:
       - 'traefik.enable=true'
       - "traefik.docker.network=traefik"
